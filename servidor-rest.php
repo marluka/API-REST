@@ -41,7 +41,7 @@
 
     /* Saber qué libro exactamente nos solicitan, para ello, tomamos la variable 
     que viene de la URL: resourceId, pero antes hay q comprobar que 'resourceId' existe */
-    $resourceId = array_key_exists('resourceId', $_GET) ? $_GET['resourceId'] : '';
+    $resourceId = (array_key_exists('resource_id', $_GET)) ? $_GET['resource_id'] : '';
 
 
     /* Generamos la respuestaa asumiendo que el pedido es correcto
@@ -76,7 +76,18 @@
             
             break;
         case 'PUT':
-            # code...
+            /* verificamos que el recurso existe, de otro modo, 
+            no sabremos cuál es el que tenemos que modificar */
+            if (!empty($resourceId) && array_key_exists($resourceId, $books)) {
+                /* Tomamos la entrada cruda */
+                $json = file_get_contents('php://input');
+
+                /* Transformamos el json recibido a un nuevo elemento del array*/
+                $books[$resourceId] = json_decode($json, true);
+
+                /* Retornamos la colección modificada en formato json */
+                echo json_encode($books);  
+            }
             break;
         case 'DELETE':
             # code...
