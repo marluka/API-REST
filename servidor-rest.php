@@ -40,7 +40,7 @@
     header('Content-Type: application/json');
 
     /* Saber qué libro exactamente nos solicitan, para ello, tomamos la variable 
-    que viene de la URL: resourceId, pero antes hay q comprobar que 'resourceId' existe*/
+    que viene de la URL: resourceId, pero antes hay q comprobar que 'resourceId' existe */
     $resourceId = array_key_exists('resourceId', $_GET) ? $_GET['resourceId'] : '';
 
 
@@ -53,15 +53,27 @@
                 echo json_encode($books);
             } else {
                 /* si el contenido de 'resourceId' existe dentro de la variable $books: 
-                devolvemos el recurso solicitado codificado en json*/
+                devolvemos el recurso solicitado codificado en json */
                 if (array_key_exists($resourceId, $books)) {
                     echo json_encode($books[$resourceId]);
                 }
             }
-            
             break;
         case 'POST':
-            # code...
+            /* file_get_contents - Transmite un fichero completo a una cadena 
+            php://input - es un flujo de sólo lectura que permite leer datos del cuerpo solicitado */
+            $json = file_get_contents('php://input');
+
+            /* Agregamos un nuevo libro a nuestra colección mediante la 
+            decodificación de ese texto json que acabamos de recibir 
+            En un caso real, esto se guatrdaría en una base de datos */
+            $books[] = json_decode($json, true);
+
+            /* Una buena práctica es devolver el id que se ha generado para el nuevo objeto, 
+            para ello, de todas las claves, solicitamos la última */
+            // echo array_keys($books)[count($books) - 1];
+            echo json_encode($books);
+            
             break;
         case 'PUT':
             # code...
