@@ -39,11 +39,26 @@
     /* Avisamos al cliente el que le vamos a enviar un json */
     header('Content-Type: application/json');
 
+    /* Saber qué libro exactamente nos solicitan, para ello, tomamos la variable 
+    que viene de la URL: resourceId, pero antes hay q comprobar que 'resourceId' existe*/
+    $resourceId = array_key_exists('resourceId', $_GET) ? $_GET['resourceId'] : '';
+
+
     /* Generamos la respuestaa asumiendo que el pedido es correcto
     $_SERVER['REQUEST_METHOD']: Variable para conocer el método con el que realizó la petición */
     switch (strtoupper($_SERVER['REQUEST_METHOD'])) {
         case 'GET':
-            echo json_encode($books);
+            /* si 'resourceId' está vacía: devolvemos colección entera */
+            if (empty($resourceId)) {
+                echo json_encode($books);
+            } else {
+                /* si el contenido de 'resourceId' existe dentro de la variable $books: 
+                devolvemos el recurso solicitado codificado en json*/
+                if (array_key_exists($resourceId, $books)) {
+                    echo json_encode($books[$resourceId]);
+                }
+            }
+            
             break;
         case 'POST':
             # code...
