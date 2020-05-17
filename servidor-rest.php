@@ -1,14 +1,34 @@
 <?php
 
-    /* AUTENTICACIÓN VIA HTTP */
-    $user = array_key_exists('PHP_AUTH_USER', $_SERVER) ? $_SERVER['PHP_AUTH_USER'] : '';
-    $pwd = array_key_exists('PHP_AUTH_PW', $_SERVER) ? $_SERVER['PHP_AUTH_PW'] : '';
+    /* AUTENTICACIÓN VIA HMAC */
 
-    /* Ejemplo de validación de usuario en caso real con una base de datos */
-    if ($user !== "usuario" || $pwd !== '1234') {
+    /* Verificamos que estos encabezados 'X - NO estandar' estén en los encabezados que recibimos */
+    if (
+        !array_key_exists('HTTP_X_HASH', $_SERVER) ||
+        !array_key_exists('HTTP_X_TIMESTAMP', $_SERVER) ||
+        !array_key_exists('HTTP_X_UID', $_SERVER) 
+        ) {
         die;
     }
-    
+
+    /* Asignación de variables en una sola instrucción */
+    list($hash, $timestamp, $uid) = [
+        $_SERVER['HTTP_X_HASH'], 
+        $_SERVER['HTTP_X_TIMESTAMP'], 
+        $_SERVER['HTTP_X_UID']
+    ];
+
+    /* Clave secreta, conocida por el cliente y servidor */
+    $secret = 'Sh!! No se lo cuentes a nadie!';
+
+    /* Generamos nuestra propia versión del hash */
+    $newHash = sha1($uid.$timestamp.$secret);
+
+    /* Comparamos el hash del usuario con el que hemos generado nosotros. 
+    En caso de que no coincidan, el usuario no se podrá autenticar */
+    if ($newHash !== $hash) {
+        die;
+    }
 
     /* Definimos los tipos de recursos que están permitidos */
     $allowedResourceTypes = [
