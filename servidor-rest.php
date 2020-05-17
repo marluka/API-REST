@@ -2,33 +2,41 @@
 
     /* AUTENTICACIÓN VIA HMAC */
 
-    /* Verificamos que estos encabezados 'X - NO estandar' estén en los encabezados que recibimos */
-    if (
-        !array_key_exists('HTTP_X_HASH', $_SERVER) ||
-        !array_key_exists('HTTP_X_TIMESTAMP', $_SERVER) ||
-        !array_key_exists('HTTP_X_UID', $_SERVER) 
-        ) {
+    /* Verificamos que el servidor recibe un token del cliente */
+    if (!array_key_exists('HTTP_X_TOKEN', $_SERVER)) {
         die;
     }
 
-    /* Asignación de variables en una sola instrucción */
-    list($hash, $timestamp, $uid) = [
-        $_SERVER['HTTP_X_HASH'], 
-        $_SERVER['HTTP_X_TIMESTAMP'], 
-        $_SERVER['HTTP_X_UID']
-    ];
+    /* Validamos el token recibido en el SERVIDOR DE AUTENTICACIÓN para ello, 
+    guadamos la URL donde va a estar escuchando el SERVIDOR DE AUTENTICACIÓN */
+    $url = 'http://localhost:8001';
 
-    /* Clave secreta, conocida por el cliente y servidor */
-    $secret = 'Sh!! No se lo cuentes a nadie!';
+    /* Ejecutamos una llamada via curl al servidopr de autenticación 
+    para q me valide el tocken*/
+    $ch = curl_init($url);
 
-    /* Generamos nuestra propia versión del hash */
-    $newHash = sha1($uid.$timestamp.$secret);
+    /* curl_setopt — Configura una opción para una transferencia cURL */
+    curl_setopt( 
+        $ch, 
+        CURLOPT_HTTPHEADER, [
+            "X-Token: {$_SERVER['HTTP_X_TOKEN']}",
+        ]
+    );
 
-    /* Comparamos el hash del usuario con el que hemos generado nosotros. 
-    En caso de que no coincidan, el usuario no se podrá autenticar */
-    if ($newHash !== $hash) {
+    curl_setopt( 
+        $ch, 
+        CURLOPT_RETURNTRANSFER, 
+        true 
+    );
+
+    /* Realizamos la llamada */
+    $ret = curl_exec($ch);
+
+    /* Verificamos que el resultado de la llama es o no true */
+    if ($ret !== 'true') {
         die;
     }
+   
 
     /* Definimos los tipos de recursos que están permitidos */
     $allowedResourceTypes = [
