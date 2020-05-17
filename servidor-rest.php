@@ -1,43 +1,5 @@
 <?php
 
-    /* AUTENTICACIÓN VIA HMAC */
-
-    /* Verificamos que el servidor recibe un token del cliente */
-    if (!array_key_exists('HTTP_X_TOKEN', $_SERVER)) {
-        die;
-    }
-
-    /* Validamos el token recibido en el SERVIDOR DE AUTENTICACIÓN para ello, 
-    guadamos la URL donde va a estar escuchando el SERVIDOR DE AUTENTICACIÓN */
-    $url = 'http://localhost:8001';
-
-    /* Ejecutamos una llamada via curl al servidopr de autenticación 
-    para q me valide el tocken*/
-    $ch = curl_init($url);
-
-    /* curl_setopt — Configura una opción para una transferencia cURL */
-    curl_setopt( 
-        $ch, 
-        CURLOPT_HTTPHEADER, [
-            "X-Token: {$_SERVER['HTTP_X_TOKEN']}",
-        ]
-    );
-
-    curl_setopt( 
-        $ch, 
-        CURLOPT_RETURNTRANSFER, 
-        true 
-    );
-
-    /* Realizamos la llamada */
-    $ret = curl_exec($ch);
-
-    /* Verificamos que el resultado de la llama es o no true */
-    if ($ret !== 'true') {
-        die;
-    }
-   
-
     /* Definimos los tipos de recursos que están permitidos */
     $allowedResourceTypes = [
         'books',
@@ -52,6 +14,7 @@
     /* verificamos que si lo que viene de la URL NO pertenece al array,
     entonces generará un error y el webservice terminará */
     if (!in_array($resourceType, $allowedResourceTypes)) {
+        http_response_code(400);
         die;
     }
 
@@ -94,6 +57,8 @@
                 devolvemos el recurso solicitado codificado en json */
                 if (array_key_exists($resourceId, $books)) {
                     echo json_encode($books[$resourceId]);
+                }else{
+                    http_response_code(404);
                 }
             }
             break;
