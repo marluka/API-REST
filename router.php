@@ -5,7 +5,13 @@
     La idea es que sea este archivo y no el Server el que reciba directamente 
     las peticiones */
 
-    $matches = [];
+    $matches = $_GET = [];
+
+    // Excepcion para las  url principal sea index.html
+    if (in_array( $_SERVER["REQUEST_URI"], [ '/index.html', '/', '' ] )) {
+        echo file_get_contents( 'index.html' );
+        die;
+    }
 
     /* Comprobamos que la URI que recibimos coincida con el patrón de 
     un string con esta estructura: /example.com/recurso*/
