@@ -65,8 +65,7 @@
             $json = file_get_contents('php://input');
 
             /* Agregamos un nuevo libro a nuestra colección mediante la 
-            decodificación de ese texto json que acabamos de recibir 
-            En un caso real, esto se guatrdaría en una base de datos */
+            decodificación de ese texto json que acabamos de recibir */
             $books[] = json_decode($json, true);
 
             /* Una buena práctica es devolver el id que se ha generado para el nuevo objeto, 
@@ -90,10 +89,18 @@
             }
             break;
         case 'DELETE':
-            # code...
+            /* verificamos que el recurso existe, de otro modo, 
+            no podemos eliminar un recurso que no tenemos en la colección */
+            if (!empty($resourceId) && array_key_exists($resourceId, $books)) {
+                /* unset - Destruye una clave especificada de un array */
+                unset($books[$resourceId]);
+            }
+            /* Mostramos la colección para verificar que se han hecho los cambios */
+            echo json_encode($books);
             break;
-        default:
-            # code...
-            break;
+            
     }
+
+    /* En un caso real, para llevar a cabo las acciones que se solicitan de GET, POST, PUT y DELETE 
+    usaríamos sentencias sql contra una base de datos, en nuestro caso, estamos trabajando con un array*/
 ?>
