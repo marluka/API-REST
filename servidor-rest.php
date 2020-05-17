@@ -1,5 +1,15 @@
 <?php
 
+    /* AUTENTICACIÓN VIA HTTP */
+    $user = array_key_exists('PHP_AUTH_USER', $_SERVER) ? $_SERVER['PHP_AUTH_USER'] : '';
+    $pwd = array_key_exists('PHP_AUTH_PW', $_SERVER) ? $_SERVER['PHP_AUTH_PW'] : '';
+
+    /* Ejemplo de validación de usuario en caso real con una base de datos */
+    if ($user !== "usuario" || $pwd !== '1234') {
+        die;
+    }
+    
+
     /* Definimos los tipos de recursos que están permitidos */
     $allowedResourceTypes = [
         'books',
