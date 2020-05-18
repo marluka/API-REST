@@ -43,7 +43,12 @@
           <tr>
             <td>Id Genero:</td>
             <td>
-              <input type="text" name="bookGenreId" id="bookGenreId" min="1" />
+              <input
+                type="text"
+                name="bookGenderId"
+                id="bookGenderId"
+                min="1"
+              />
             </td>
           </tr>
           <tr>
@@ -90,5 +95,25 @@
           "</td></tr>"
       );
     }
+
+    $("#bookSave").click(function () {
+      var newBook = {
+        title: $("#bookTitle").val(),
+        id_author: $("#bookAuthorId").val(),
+        id_gender: $("#bookGenderId").val(),
+      };
+      $("#messages").first("p").text("Guardando libro...");
+      $("#messages").show();
+
+      $.ajax({
+        url: "http://localhost:8000/books",
+        method: "POST",
+        data: JSON.stringify(newBook),
+        success: function (data) {
+          $("#messages").hide();
+          addBook(newBook);
+        },
+      });
+    });
   </script>
 </html>
